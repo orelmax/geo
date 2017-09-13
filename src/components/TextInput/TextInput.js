@@ -9,28 +9,14 @@ class TextInput extends Component {
 
     this.input = null;
     this.state = {
-      hasError: false,
       value: props.defaultValue,
     };
   }
 
-  validate(value) {
-    const { rule } = this.props;
-
-    if (rule !== undefined && typeof rule === 'function') {
-      return rule(value);
-    }
-
-    // no rules - than value hasn't be validated
-    return true;
-  }
-
   onType = (e) => {
     const { value } = e.target;
-    const hasError = !this.validate(value);
 
     this.setState({
-      hasError,
       value,
     }, () => {
       if (this.props.onChange && typeof this.props.onChange === 'function' ) this.props.onChange(e);
@@ -40,7 +26,7 @@ class TextInput extends Component {
   render() {
     const {
       errorText,
-      rule,
+      hasError,
       ...rest
     } = this.props;
 
@@ -57,7 +43,7 @@ class TextInput extends Component {
         />
 
         {
-          this.state.hasError && <ErrorText>{ errorText }</ErrorText>
+          hasError && <ErrorText>{ errorText }</ErrorText>
         }
       </div>
     );
@@ -65,7 +51,7 @@ class TextInput extends Component {
 }
 
 TextInput.propTypes = {
-  rule: PropTypes.func,
+  hasError: PropTypes.bool.isRequired,
   defaultValue: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -74,7 +60,6 @@ TextInput.propTypes = {
 };
 TextInput.defaultProps = {
   defaultValue: '',
-  rule: undefined,
   errorText: 'Value is invalid',
 };
 

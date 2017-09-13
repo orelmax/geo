@@ -44,7 +44,7 @@ class AddressField extends Component {
         <TextInput
           placeholder="Address"
           name="address"
-          rule={this.props.validate}
+          hasError={this.props.hasError}
           errorText="Address shouldn't be empty"
           ref={this.saveRef}
         />
@@ -54,7 +54,7 @@ class AddressField extends Component {
 }
 
 AddressField.propTypes = {
-  validate: PropTypes.func.isRequired,
+  hasError: PropTypes.bool.isRequired,
   setMapCenter: PropTypes.func.isRequired,
 };
 

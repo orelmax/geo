@@ -7,15 +7,29 @@ import './Panel.css';
 
 class Panel extends React.Component {
   state = {
-    code: undefined,
+    canShowResult: false,
   };
+
+  onGenerateJson = () => {
+    this.setState({
+      canShowResult: true,
+    });
+  }
 
   render() {
     return (
       <div className="panelWrapper">
         <Header>Panel</Header>
-        <Form setMapCenter={this.props.setMapCenter} />
-        <Result code={this.state.code} />
+        <Form
+          setMapCenter={this.props.setMapCenter}
+          setRadius={this.props.setRadius}
+          generateJson={this.onGenerateJson}
+          defaultRadius={this.props.defaultRadius}
+        />
+        <Result
+          canShowResult={this.state.canShowResult}
+          code={this.props.code}
+        />
       </div>
     );
   }
@@ -23,6 +37,9 @@ class Panel extends React.Component {
 
 Panel.propTypes = {
   setMapCenter: PropTypes.func.isRequired,
+  setRadius: PropTypes.func.isRequired,
+  defaultRadius: PropTypes.number.isRequired,
+  code: PropTypes.string,
 }
 
 export default Panel;

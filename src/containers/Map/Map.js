@@ -19,10 +19,13 @@ const CIRCLE_OPTS = {
   fillOpacity: 0.35,
 }
 
+const makeId = ({ lat, lng }) => `${lat}${lng}`;
+
 class GeoMap extends React.Component {
   mapRef = null;
   map = null;
   mapapi = null;
+  circle = null;
 
   componentWillMount() {
     this.initMap();
@@ -30,11 +33,12 @@ class GeoMap extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.coordinates !== this.props.coordinates) {
-      this.highlightAddress(nextProps.coordinates);
+      this.highlightAddress(nextProps);
+    } else if (nextProps.coordinates !== undefined && nextProps.radius !== this.props.radius) {
+      this.updateRadius(nextProps);
     }
   }
   
-
   async initMap() {
     try {
       this.mapapi = await getGoogleMapApi();
@@ -44,16 +48,41 @@ class GeoMap extends React.Component {
     }
   }
 
-  highlightAddress(coords) {
+  highlightAddress({ coordinates, radius }) {
     this.map.setOptions({
-      center: coords,
+      center: coordinates,
       zoom: 14,
     });
-    new this.mapapi.Circle(Object.assign({}, CIRCLE_OPTS, {
+
+    this.circle = new this.mapapi.Circle(Object.assign({}, CIRCLE_OPTS, {
       map: this.map,
-      radius: 1000,
-      center: coords,
+      radius,
+      center: coordinates,
     }));
+
+    this.map.data.add(new this.mapapi.Data.Feature({
+      id: makeId(coordinates),
+      geometry: new this.mapapi.Data.Point(coordinates),
+      properties: {
+        radius,
+      },
+    }));
+
+    this.saveTempJson();
+  }
+
+  updateRadius({ coordinates, radius }) {
+    const feature = this.map.data.getFeatureById(makeId(coordinates));
+    feature.setProperty('radius', radius);
+
+    this.circle.setRadius(radius);
+    this.saveTempJson();
+  }
+
+  saveTempJson() {
+    // we need to store on each change to be able to get
+    // result on click from another component, like Panel
+    this.map.data.toGeoJson(this.props.saveTempJson);
   }
 
   render() {
@@ -71,6 +100,11 @@ GeoMap.propTypes = {
     lat: PropTypes.number,
     lng: PropTypes.number,
   }),
-}
+  saveTempJson: PropTypes.func.isRequired,
+  radius: PropTypes.number,
+};
+GeoMap.defaultProps = {
+  radius: undefined,
+};
 
 export default GeoMap;
