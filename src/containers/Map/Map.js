@@ -1,9 +1,8 @@
 import React from 'react';
-import createGMapsApi from 'google-maps-api';
-import { GOOGLE_API_KEY } from '../../_configs';
+import PropTypes from 'prop-types';
+import getGoogleMapApi from '../../utils/googleMap';
 import './Map.css';
 
-const mapsApi = createGMapsApi(GOOGLE_API_KEY);
 const INITIAL_MAP_OPTS = {
   center: {
     lat: 10.46,
@@ -14,15 +13,28 @@ const INITIAL_MAP_OPTS = {
 
 class GeoMap extends React.Component {
   mapRef = null;
+  map = null;
 
   componentWillMount() {
-    // this.initMap();
+    this.initMap();
   }
 
-  initMap() {
-    mapsApi().then((map) => {
-      new map.Map(this.mapRef, INITIAL_MAP_OPTS);
-    });
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.coordinates !== this.props.coordinates) {
+      this.map.setOptions({
+        center: nextProps.coordinates,
+        zoom: 14,
+      });
+    }
+  }
+
+  async initMap() {
+    try {
+      const mapapi = await getGoogleMapApi();
+      this.map = new mapapi.Map(this.mapRef, INITIAL_MAP_OPTS);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   render() {
@@ -34,5 +46,12 @@ class GeoMap extends React.Component {
     );
   }
 };
+
+GeoMap.propTypes = {
+  coordinates: PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }),
+}
 
 export default GeoMap;

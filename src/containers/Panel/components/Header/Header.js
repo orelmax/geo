@@ -11,7 +11,10 @@ const PanelHeader = props => {
 };
 
 PanelHeader.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.string,
+  ]).isRequired,
 };
 
 export default PanelHeader;

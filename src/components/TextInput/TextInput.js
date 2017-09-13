@@ -7,6 +7,7 @@ class TextInput extends Component {
   constructor(props) {
     super(props);
 
+    this.input = null;
     this.state = {
       hasError: false,
       value: props.defaultValue,
@@ -31,6 +32,8 @@ class TextInput extends Component {
     this.setState({
       hasError,
       value,
+    }, () => {
+      if (this.props.onChange && typeof this.props.onChange === 'function' ) this.props.onChange(e);
     });
   }
 
@@ -44,6 +47,10 @@ class TextInput extends Component {
     return (
       <div className="inputWrapper">
         <input
+          ref={(elem) => {
+            // "inject" actual node to the instance of TextInput
+            return this.input = elem;
+          }}
           className="input"
           onChange={this.onType}
           {...rest}

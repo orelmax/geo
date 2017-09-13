@@ -7,4 +7,5 @@
 
 .result__code {
   white-space: normal;
+  word-break: break-all;
 }
