@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import TextInput from '../../../../components/TextInput';
 import AddressField from '../AddressField';
+import RadiusSlider from '../RadiusSlider';
 import './Forms.css'
 
-const radiusRegExp = new RegExp('^[0-9]+$');
+const MIN_RADIUS = 50;
+const MAX_RADIUS = 10000;
 
 class Form extends Component {
   state = {
@@ -29,13 +31,8 @@ class Form extends Component {
       return true;
     }
 
-    if (!radiusRegExp.test(value)) {
-      this.setState({ radius: false });
-      return false;
-    }
-
-    const v = parseInt(value, 10);
-    const valid = typeof v === 'number' && v > 0 && v < 50000;
+    const v = typeof v !== 'number' ? parseInt(value, 10) : value;
+    const valid = typeof v === 'number' && v >= MIN_RADIUS && v <= MAX_RADIUS;
     this.setState({ radius: valid });
   
     return valid;
@@ -47,9 +44,9 @@ class Form extends Component {
     }
   }
 
-  onChangeRadius = (e) => {
-    if (this.validateRadius(e.target.value)) {
-      this.props.setRadius(parseInt(e.target.value, 10));
+  onChangeRadius = (value) => {
+    if (this.validateRadius(value)) {
+      this.props.setRadius(value);
     }
   }
 
@@ -63,15 +60,11 @@ class Form extends Component {
           setMapCenter={this.onAddressChange}
           hasError={!address}
         />
-        
-        <TextInput
-          placeholder="Radius"
-          type="number"
-          name="radius"
-          defaultValue={this.props.defaultRadius}
-          onChange={this.onChangeRadius}
-          hasError={!radius}
-          errorText="Radius cannot be less than 0"
+        <RadiusSlider
+          min={MIN_RADIUS}
+          max={MAX_RADIUS}
+          defaultRadius={this.props.defaultRadius}
+          setRadius={this.onChangeRadius}
         />
         <button
           disabled={!canSubmit}

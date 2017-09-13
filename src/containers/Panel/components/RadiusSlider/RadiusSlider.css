@@ -1,0 +1,38 @@
+.slider {
+  position: relative;
+  min-height: 40px;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.slider__inn {
+  position: absolute;
+  width: 100%;
+  top: 20px;
+}
+
+.slider__range {
+  display: flex;
+  justify-content: space-between;
+}
+
+.slider__back {
+  height: 2px;
+  background-color: #777;
+  margin-top: -1px;
+  cursor: pointer;
+}
+.slider__handler {
+  width: 8px;
+  height: 20px;
+  background-color: blue;
+  position: absolute;
+  margin-top: -10px;
+  margin-left: -4px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.radius__current {
+  margin-top: 20px;
+}
