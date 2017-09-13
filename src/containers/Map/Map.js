@@ -11,9 +11,18 @@ const INITIAL_MAP_OPTS = {
   zoom: 13,
 };
 
+const CIRCLE_OPTS = {
+  strokeColor: '#00c5ff',
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  fillColor: '#00c5ff',
+  fillOpacity: 0.35,
+}
+
 class GeoMap extends React.Component {
   mapRef = null;
   map = null;
+  mapapi = null;
 
   componentWillMount() {
     this.initMap();
@@ -21,20 +30,30 @@ class GeoMap extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.coordinates !== this.props.coordinates) {
-      this.map.setOptions({
-        center: nextProps.coordinates,
-        zoom: 14,
-      });
+      this.highlightAddress(nextProps.coordinates);
     }
   }
+  
 
   async initMap() {
     try {
-      const mapapi = await getGoogleMapApi();
-      this.map = new mapapi.Map(this.mapRef, INITIAL_MAP_OPTS);
+      this.mapapi = await getGoogleMapApi();
+      this.map = new this.mapapi.Map(this.mapRef, INITIAL_MAP_OPTS);
     } catch (err) {
       console.error(err);
     }
+  }
+
+  highlightAddress(coords) {
+    this.map.setOptions({
+      center: coords,
+      zoom: 14,
+    });
+    new this.mapapi.Circle(Object.assign({}, CIRCLE_OPTS, {
+      map: this.map,
+      radius: 1000,
+      center: coords,
+    }));
   }
 
   render() {
